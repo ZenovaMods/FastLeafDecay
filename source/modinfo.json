@@ -1,0 +1,8 @@
+{
+    "nameId": "FastLeafDecay",
+    "name": "Fast Leaf Decay",
+    "description": "Makes leaves decay faster when a tree is cut down.",
+    "version": "1.0.0",
+    "minVersion": "1.14.60.5",
+    "maxVersion": "1.14.60.5"
+}
