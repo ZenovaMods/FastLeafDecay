@@ -1,7 +1,9 @@
-#include "Zenova.h"
+#include "FastLeafDecay.h"
+#include "main.h"
 
 #include "minecraft/BlockSource.h"
 #include "minecraft/Level.h"
+#include "minecraft/LeafBlock.h"
 
 #include <vector>
 #include <tuple>
@@ -20,39 +22,33 @@ static int randomizationTime = maxDecayTime - baseDecayTime;
 bool (*_setBlock)(BlockSource*, const BlockPos&, const Block&, int, void*, const ActorBlockSyncMessage*);
 bool setBlock(BlockSource* self, const BlockPos& pos, const Block& block, int updateFlags, void* blockEntity, const ActorBlockSyncMessage* syncMsg) {
 	bool ret = _setBlock(self, pos, block, updateFlags, blockEntity, syncMsg);
-	if (decay)
-		self->addToTickingQueue(pos, block, baseDecayTime + self->getLevel().getRandom().nextInt(randomizationTime), 0);
+	if (decay) {
+		if (FastLeafDecay::versionId == "1.14.60.5")
+			self->addToTickingQueue(pos, block, baseDecayTime + self->getLevel().getRandom().nextInt(randomizationTime), 0);
+		else
+			self->_addToTickingQueue(pos, block, baseDecayTime + self->getLevel2().getRandom().nextInt(randomizationTime), 0, TickingQueueType::Internal);
+	}
 	return ret;
 }
 
-void (*_leafDecay)(BlockSource&, const BlockPos&, int);
-void leafDecay(BlockSource& region, const BlockPos& pos, int range) {
+void (*_LeafBlock_runDecay)(BlockSource&, const BlockPos&, int);
+void LeafBlock_runDecay(BlockSource& region, const BlockPos& pos, int range) {
 	decay = true;
-	_leafDecay(region, pos, range);
+	_LeafBlock_runDecay(region, pos, range);
 	decay = false;
 }
 
-void (*_beginCreativeGroup)(const std::string&, short, short, const CompoundTag*);
-void beginCreativeGroup(const std::string& groupName, short id, short auxValue, const CompoundTag* userData) {
-	return;
+std::string FastLeafDecay::versionId;
+
+void FastLeafDecay::Start() {
+	//Zenova::Platform::DebugPause();
+	Zenova_Info("FastLeafDecay start");
+	versionId = GetManager().GetLaunchedVersion();
+	InitVersionPointers(versionId);
+
+	Zenova::Hook::Create(&LeafBlock::runDecay, &LeafBlock_runDecay, &_LeafBlock_runDecay);
+	Zenova::Hook::Create(&BlockSource::setBlock, &setBlock, &_setBlock);
 }
-
-
-class FastLeafDecay : public Zenova::Mod {
-	virtual void Start() {
-		Zenova::Platform::DebugPause();
-		std::cout << "FastLeafDecay start" << std::endl;
-
-		Zenova::Platform::CreateHook(reinterpret_cast<void*>(Zenova::Hook::SlideAddress(0x16C4E10)), leafDecay, (void**)&_leafDecay);
-		Zenova::Platform::CreateHook(reinterpret_cast<void*>(Zenova::Hook::SlideAddress(0x1779860)), setBlock, (void**)&_setBlock);
-		Zenova::Platform::CreateHook(reinterpret_cast<void*>(Zenova::Hook::SlideAddress(0x1560AC0)), beginCreativeGroup, (void**)&_beginCreativeGroup);
-	}
-
-	virtual ~FastLeafDecay() {}
-	virtual void Update() {}
-	virtual void Tick() {}
-	virtual void Stop() {}
-};
 
 MOD_FUNCTION Zenova::Mod* CreateMod() {
 	return new FastLeafDecay;

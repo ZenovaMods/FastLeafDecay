@@ -2,15 +2,32 @@
   "functions": [
     {
       "name": "?_genRandInt32@Random@Core@@AEAAIXZ",
-      "address": "0x01AC370"
+      "address": {
+        "1.14.60.5": "0x01AC370",
+        "1.16.0.2": "0x01D2B70"
+      }
     },
     {
       "name": "?addToTickingQueue@BlockSource@@QEAAXAEBVBlockPos@@AEBVBlock@@HH@Z",
       "address": "0x1778AB0"
     },
     {
+      "name": "?_addToTickingQueue@BlockSource@@QEAAXAEBVBlockPos@@AEBVBlock@@HHW4TickingQueueType@@@Z",
+      "address": "0x18C9E30"
+    },
+    {
       "name": "?setBlock@BlockSource@@QEAA_NAEBVBlockPos@@AEBVBlock@@HV?$shared_ptr@VBlockActor@@@std@@PEBUActorBlockSyncMessage@@@Z",
-      "address": "0x1779860"
+      "address": {
+        "1.14.60.5": "0x1779860",
+        "1.16.0.2": "0x18CAA00"
+      }
+    },
+    {
+      "name": "?runDecay@LeafBlock@@SAXAEAVBlockSource@@AEBVBlockPos@@H@Z",
+      "address": {
+        "1.14.60.5": "0x16C4E10",
+        "1.16.0.2": "0x17DDA20"
+      }
     }
   ]
 }
